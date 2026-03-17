@@ -29,20 +29,31 @@ prompt = """You are Ahmad's personal intelligence agent based in Dubai. Search t
 
 Keep every bullet under 2 lines. Be direct. No filler."""
 
-response = requests.post(
-    "https://api.moonshot.cn/v1/chat/completions",
-    headers={
-        "Authorization": f"Bearer {KIMI_API}",
-        "Content-Type": "application/json"
-    },
-    json={
-        "model": "moonshot-v1-8k",
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 1000
-    }
-).json()
+try:
+    response = requests.post(
+        "https://api.moonshot.cn/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {KIMI_API}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": "moonshot-v1-8k",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 1000
+        }
+    )
+    
+    data = response.json()
+    
+    if "choices" in data:
+        message = data["choices"][0]["message"]["content"]
+    elif "error" in data:
+        message = f"API Error: {data['error']}"
+    else:
+        message = f"Unexpected response: {str(data)}"
 
-message = response["choices"][0]["message"]["content"]
+except Exception as e:
+    message = f"Bot error: {str(e)}"
 
 requests.post(
     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
