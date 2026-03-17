@@ -2,7 +2,7 @@ import requests
 
 TELEGRAM_TOKEN = "8592300292:AAErZvhkkIwaHhAVzzJYIgfg0LLPpf9s3hA"
 CHAT_ID = "7561205372"
-KIMI_API = "sk-IneUi2Wsb7Mpdym1xVaibbrtZstAQwkLquQBQx5wapDytG50"
+OPENROUTER_API = "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"
 
 prompt = """You are Ahmad's personal intelligence agent based in Dubai. Deliver today's briefing:
 
@@ -31,13 +31,15 @@ Be direct. No filler. Max 2 lines per bullet."""
 
 try:
     response = requests.post(
-        "https://api.moonshot.cn/v1/chat/completions",
+        "https://openrouter.ai/api/v1/chat/completions",
         headers={
-            "Authorization": f"Bearer {KIMI_API}",
-            "Content-Type": "application/json"
+            "Authorization": f"Bearer {OPENROUTER_API}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://ahmad-bot.onrender.com",
+            "X-Title": "Ahmad Intelligence Bot"
         },
         json={
-            "model": "moonshot-v1-8k",
+            "model": "moonshotai/kimi-k2:free",
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": 1000
         }
