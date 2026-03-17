@@ -2,7 +2,7 @@ import requests
 
 TELEGRAM_TOKEN = "8592300292:AAFV6LicNEJl03QX-F7X_ZKO2C7dCEloT8M"
 CHAT_ID = "7561205372"
-GEMINI_API = "AIzaSyDCxnsldCR8YXjZVUj5YwqWDqgsTYbpaXA"
+KIMI_API = "sk-IneUi2Wsb7Mpdym1xVaibbrtZstAQwkLquQBQx5wapDytG50"
 
 prompt = """You are Ahmad's personal intelligence agent based in Dubai. Deliver today's briefing:
 
@@ -31,24 +31,29 @@ Be direct. No filler. Max 2 lines per bullet."""
 
 try:
     response = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API}",
-        headers={"Content-Type": "application/json"},
+        "https://api.moonshot.ai/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {KIMI_API}",
+            "Content-Type": "application/json"
+        },
         json={
-            "contents": [{"parts": [{"text": prompt}]}]
+            "model": "moonshot-v1-8k",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 1000
         }
     )
 
     data = response.json()
 
-    if "candidates" in data:
-        message = data["candidates"][0]["content"]["parts"][0]["text"]
+    if "choices" in data:
+        message = data["choices"][0]["message"]["content"]
     elif "error" in data:
-        message = f"API Error: {data['error']['message']}"
+        message = f"API Error: {data['error']}"
     else:
-        message = f"Unexpected response: {str(data)}"
+        message = f"Unexpected: {str(data)}"
 
 except Exception as e:
-    message = f"Bot error: {str(e)}"
+    message = f"Error: {str(e)}"
 
 requests.post(
     f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
